@@ -1,8 +1,16 @@
 #!/usr/bin/python3
 
 from PIL import Image
-import random, sys
-import re # parse for a file input(s?)
+import random
+import argparse
+
+parser = argparse.ArgumentParser(description='Takes an image and turns it in to braille characters')
+
+parser.add_argument('--invert', action='store_true')
+parser.add_argument('filename', help='the file that will be converted')
+
+args = parser.parse_args()
+
 
 average = lambda x: sum(x)/len(x) if len(x) > 0 else 0
 start = 0x2800
@@ -12,18 +20,11 @@ dither = 10
 sensitivity = 0.8
 char_width_divided = round(char_width / 2)
 char_height_divided = round(char_height / 4)
-
 output_buffer = ""
 
-filename = input("file: ")
 
-#filename = "../Pictures/Anthony Foxx official portrait.jpg"
-#filename = "../Pictures/bait k.jpg"
-#filename = "sample.png"
-
-
-base = Image.open(filename)
-match = lambda a, b: a < b if "--invert" in sys.argv else a > b
+base = Image.open(args.filename)
+match = lambda a, b: a < b if args.invert else a > b
 def image_average(x1, y1, x2, y2):
     return average([average(base.getpixel((x, y))[:3]) for x in range(x1, x2) for y in range(y1, y2)])
 def convert_index(x):
