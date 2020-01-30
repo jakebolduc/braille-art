@@ -6,16 +6,21 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Takes an image and turns it in to braille characters')
 
-parser.add_argument('--invert', action='store_true')
+parser.add_argument('--invert', help='invert the image. usefull for black-on-white.', action='store_true')
 parser.add_argument('filename', help='the file that will be converted')
-
+parser.add_argument('--width', help='set the width of the output. usefull for small terminal screens.', type=int)
 args = parser.parse_args()
+print(args)
 
 
+base = Image.open(args.filename)
+if args.width == None:
+	char_width = 10
+else:
+	char_width = round(base.width / args.width)
+char_height = char_width * 2
 average = lambda x: sum(x)/len(x) if len(x) > 0 else 0
 start = 0x2800
-char_width = 10
-char_height = char_width * 2
 dither = 10
 sensitivity = 0.8
 char_width_divided = round(char_width / 2)
@@ -23,7 +28,7 @@ char_height_divided = round(char_height / 4)
 output_buffer = ""
 
 
-base = Image.open(args.filename)
+
 match = lambda a, b: a < b if args.invert else a > b
 def image_average(x1, y1, x2, y2):
     return average([average(base.getpixel((x, y))[:3]) for x in range(x1, x2) for y in range(y1, y2)])
